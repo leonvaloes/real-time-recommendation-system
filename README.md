@@ -7,18 +7,18 @@ A ideia principal dessa arquitetura e separar responsabilidades: a API recebe as
 ## Estrutura do projeto
 
 ```text
-CleanArch/
-  CleanArch.API/
-  CleanArch.Application/
-  CleanArch.Domain/
-  CleanArch.Infra.Data/
-  CleanArch.Infra.IoC/
-  CleanArch.Domain.Tests/
-  CleanArch.Data/
+UserAuthCleanArch/
+  UserAuth.CleanArch.API/
+  UserAuth.CleanArch.Application/
+  UserAuth.CleanArch.Domain/
+  UserAuth.CleanArch.Infra.Data/
+  UserAuth.CleanArch.Infra.IoC/
+  UserAuth.CleanArch.Domain.Tests/
+  UserAuth.CleanArch.Data/
 Docker/
 ```
 
-## CleanArch.API
+## UserAuth.CleanArch.API
 
 Camada de entrada da aplicacao.
 
@@ -50,7 +50,7 @@ POST /api/auth/login
 
 Esses endpoints recebem os dados da requisicao, chamam `IAuthService` e retornam uma resposta com dados do usuario autenticado e um token.
 
-## CleanArch.Application
+## UserAuth.CleanArch.Application
 
 Camada de aplicacao.
 
@@ -87,7 +87,7 @@ Responsabilidades do `AuthService`:
 
 As interfaces `IPasswordHasher` e `ITokenService` ficam na camada de aplicacao para que o caso de uso dependa de contratos, nao de detalhes de implementacao.
 
-## CleanArch.Domain
+## UserAuth.CleanArch.Domain
 
 Camada central do sistema.
 
@@ -126,7 +126,7 @@ O `User` guarda o hash da senha, nao a senha em texto puro. A pessoa associada a
 
 Essa camada nao deve depender da API, da infraestrutura, do MongoDB ou de frameworks externos de persistencia.
 
-## CleanArch.Infra.Data
+## UserAuth.CleanArch.Infra.Data
 
 Camada de infraestrutura de dados.
 
@@ -155,7 +155,7 @@ O `MongoContext` le as variaveis de ambiente:
 
 O `UserRepository` usa a colecao `users` para criar, buscar, atualizar e remover usuarios.
 
-## CleanArch.Infra.IoC
+## UserAuth.CleanArch.Infra.IoC
 
 Camada de injecao de dependencia.
 
@@ -187,7 +187,7 @@ A API chama essa configuracao no `Program.cs`:
 builder.Services.AddInfrastructure(builder.Configuration);
 ```
 
-## CleanArch.Domain.Tests
+## UserAuth.CleanArch.Domain.Tests
 
 Projeto de testes.
 
@@ -206,11 +206,11 @@ Exemplo de teste existente:
 Criar pessoa fisica com CPF invalido deve lancar DomainExceptionValidation.
 ```
 
-## CleanArch.Data
+## UserAuth.CleanArch.Data
 
 Esse projeto existe na estrutura, mas atualmente parece nao ter responsabilidade real implementada. Ele contem apenas um arquivo inicial `Class1.cs`.
 
-Pelo desenho atual, a infraestrutura de dados esta sendo feita em `CleanArch.Infra.Data`.
+Pelo desenho atual, a infraestrutura de dados esta sendo feita em `UserAuth.CleanArch.Infra.Data`.
 
 ## Docker
 
@@ -233,13 +233,13 @@ Exemplo: criar usuario.
 
 ```text
 Cliente HTTP
-  -> CleanArch.API/UserController
-  -> CleanArch.Application/UserService
-  -> CleanArch.Application/CreateUserMapping
-  -> CleanArch.Domain/User
-  -> CleanArch.Domain/IUserRepository
-  -> CleanArch.Infra.Data/UserRepository
-  -> CleanArch.Infra.Data/MongoContext
+  -> UserAuth.CleanArch.API/UserController
+  -> UserAuth.CleanArch.Application/UserService
+  -> UserAuth.CleanArch.Application/CreateUserMapping
+  -> UserAuth.CleanArch.Domain/User
+  -> UserAuth.CleanArch.Domain/IUserRepository
+  -> UserAuth.CleanArch.Infra.Data/UserRepository
+  -> UserAuth.CleanArch.Infra.Data/MongoContext
   -> MongoDB
 ```
 
@@ -247,14 +247,14 @@ Exemplo: login.
 
 ```text
 Cliente HTTP
-  -> CleanArch.API/AuthController
-  -> CleanArch.Application/AuthService
-  -> CleanArch.Domain/IUserRepository
-  -> CleanArch.Infra.Data/UserRepository
-  -> CleanArch.Infra.Data/MongoContext
+  -> UserAuth.CleanArch.API/AuthController
+  -> UserAuth.CleanArch.Application/AuthService
+  -> UserAuth.CleanArch.Domain/IUserRepository
+  -> UserAuth.CleanArch.Infra.Data/UserRepository
+  -> UserAuth.CleanArch.Infra.Data/MongoContext
   -> MongoDB
-  -> CleanArch.Application/IPasswordHasher
-  -> CleanArch.Application/ITokenService
+  -> UserAuth.CleanArch.Application/IPasswordHasher
+  -> UserAuth.CleanArch.Application/ITokenService
 ```
 
 ## Dependencias entre camadas
@@ -282,19 +282,19 @@ O dominio fica no centro e nao deve depender das outras camadas.
 Build do projeto de testes e referencias:
 
 ```bash
-dotnet build CleanArch/CleanArch.Domain.Tests/CleanArch.Domain.Tests.csproj
+dotnet build UserAuthCleanArch/UserAuth.CleanArch.Domain.Tests/UserAuth.CleanArch.Domain.Tests.csproj
 ```
 
 Executar testes:
 
 ```bash
-dotnet test CleanArch/CleanArch.Domain.Tests/CleanArch.Domain.Tests.csproj
+dotnet test UserAuthCleanArch/UserAuth.CleanArch.Domain.Tests/UserAuth.CleanArch.Domain.Tests.csproj
 ```
 
 Executar testes com cobertura:
 
 ```bash
-dotnet test CleanArch/CleanArch.Domain.Tests/CleanArch.Domain.Tests.csproj --collect:"XPlat Code Coverage"
+dotnet test UserAuthCleanArch/UserAuth.CleanArch.Domain.Tests/UserAuth.CleanArch.Domain.Tests.csproj --collect:"XPlat Code Coverage"
 ```
 
 Subir API, MongoDB e Mongo Express:
@@ -333,8 +333,8 @@ Exemplo local usando o Docker Compose:
 MONGODB_URI=mongodb://user:1234@localhost:27017/
 MONGODB_DB=cleanarch
 JWT_SECRET=change-this-secret-in-development
-JWT_ISSUER=CleanArch.API
-JWT_AUDIENCE=CleanArch.Client
+JWT_ISSUER=UserAuth.CleanArch.API
+JWT_AUDIENCE=UserAuth.CleanArch.Client
 ```
 
 ## Modulo de autenticacao

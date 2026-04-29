@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UserAuth.CleanArch.Application\UserAuth.CleanArch.Application.csproj" />
+    <ProjectReference Include="..\UserAuth.CleanArch.Domain\UserAuth.CleanArch.Domain.csproj" />
+    <ProjectReference Include="..\UserAuth.CleanArch.Infra.Data\UserAuth.CleanArch.Infra.Data.csproj" />
+  </ItemGroup>
+
+</Project>

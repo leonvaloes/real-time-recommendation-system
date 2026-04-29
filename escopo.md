@@ -193,7 +193,7 @@ Os itens abaixo nao fazem parte da primeira entrega:
 2. Permitir associar roles a usuarios.
 3. Criar modulo `Recommendation` usando Hexagonal Architecture.
 4. Criar modulo `Catalog/Purchase` usando Onion Architecture.
-5. Evoluir o `CatalogService` MVC com persistencia propria.
+5. Evoluir o `CatalogServiceMvc` MVC com persistencia propria.
 6. Adicionar testes de aplicacao para autenticacao e autorizacao.
 7. Adicionar testes de integracao com MongoDB via Docker.
 
