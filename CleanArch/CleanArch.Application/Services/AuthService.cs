@@ -36,7 +36,8 @@ public class AuthService : IAuthService
         var user = new User(normalizedEmail, passwordHash, person, request.Phone);
         user.AddRole(new Role("User", new[]
         {
-            new PermissionClaim("permission", "users:read")
+            new PermissionClaim("permission", "users:read"),
+            new PermissionClaim("permission", "catalog:read")
         }));
 
         await _userRepository.CreateAsync(user);

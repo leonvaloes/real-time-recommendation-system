@@ -1,4 +1,19 @@
 services:
+  catalog-service:
+    build:
+      context: ..
+      dockerfile: Services/CatalogService/Dockerfile
+    restart: always
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      JWT_SECRET: change-this-secret-in-development
+      JWT_ISSUER: CleanArch.API
+      JWT_AUDIENCE: CleanArch.Client
+    ports:
+      - 5001:8080
+    depends_on:
+      - cleanarch-api
+
   cleanarch-api:
     build:
       context: ..
