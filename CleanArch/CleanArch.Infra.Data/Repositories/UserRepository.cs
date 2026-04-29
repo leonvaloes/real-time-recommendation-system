@@ -1,14 +1,15 @@
 ﻿using CleanArch.Domain.Entities;
+using CleanArch.Domain.Interfaces;
 using CleanArch.Infra.Data.Context;
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
 namespace CleanArch.Infra.Data.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private MongoContext _mongoContext;
-    public UserRepository (MongoContext mongoContext)
+    private readonly MongoContext _mongoContext;
+
+    public UserRepository(MongoContext mongoContext)
     {
         _mongoContext = mongoContext;
     }
@@ -43,18 +44,24 @@ public class UserRepository : IUserRepository
     }
 
 
-    public Task<User> GetByEmailAsync(string email)
+    public async Task<User> GetByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await _mongoContext.Users.Find(u => u.Email == email).FirstOrDefaultAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public Task<User> GetByIdAsync(int? id)
     {
         try
         {
-            var sort = Builders<User>.Sort.Ascending(u => u.Id);
-            var user = _mongoContext.Users.Find(u => u.Id == id).Sort(sort).FirstOrDefaultAsync();
-            return user;
+            return _mongoContext.Users.Find(u => u.Id == id).FirstOrDefaultAsync();
         }
         catch (Exception e)
         {
@@ -64,14 +71,33 @@ public class UserRepository : IUserRepository
 
     }
 
-    public Task<User> RemoveByIdAsync(int id)
+    public async Task<User> RemoveByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var user = await GetByIdAsync(id);
+            await _mongoContext.Users.DeleteOneAsync(u => u.Id == id);
+            return user;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<User> UpdateAsync(User user)
+    public async Task<User> UpdateAsync(User user)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _mongoContext.Users.ReplaceOneAsync(u => u.Id == user.Id, user);
+            return user;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
 }

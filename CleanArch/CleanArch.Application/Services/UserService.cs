@@ -1,43 +1,51 @@
 using CleanArch.Application.DTOs;
+using CleanArch.Application.Interfaces;
 using CleanArch.Application.Mappings;
 using CleanArch.Domain.Entities;
+using CleanArch.Domain.Interfaces;
 
-namespace CleanArchMvc.Application.Interfaces.Services;
+namespace CleanArch.Application.Services;
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
-    private readonly CreateUserMapping createUserMapping;
+    private readonly CreateUserMapping _createUserMapping;
 
-    async Task<User> IUserService.CreateAsync(CreateUserDTO createUserDTO)
+    public UserService(IUserRepository userRepository, CreateUserMapping createUserMapping)
     {
-        var createUserEntity =  createUserMapping.ToEntity(createUserDTO);
+        _userRepository = userRepository;
+        _createUserMapping = createUserMapping;
+    }
+
+    public async Task<User> CreateAsync(CreateUserDTO createUserDTO)
+    {
+        var createUserEntity = _createUserMapping.ToEntity(createUserDTO);
         await _userRepository.CreateAsync(createUserEntity);
         return createUserEntity;
     }
 
-    Task<List<User>> IUserService.GetAllAsync()
+    public Task<List<User>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return _userRepository.GetAllAsync();
     }
 
-    Task<User> IUserService.GetByEmailAsync(string email)
+    public Task<User> GetByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        return _userRepository.GetByEmailAsync(email);
     }
 
-    Task<User> IUserService.GetByIdAsync(int? id)
+    public Task<User> GetByIdAsync(int? id)
     {
-        throw new NotImplementedException();
+        return _userRepository.GetByIdAsync(id);
     }
 
-    Task<User> IUserService.RemoveByIdAsync(int id)
+    public Task<User> RemoveByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        return _userRepository.RemoveByIdAsync(id);
     }
 
-    Task<User> IUserService.UpdateAsync(User user)
+    public Task<User> UpdateAsync(User user)
     {
-        throw new NotImplementedException();
+        return _userRepository.UpdateAsync(user);
     }
 }
