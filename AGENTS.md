@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository follows a layered Clean Architecture layout under `UserAuthCleanArch/`. `UserAuth.CleanArch.Domain` holds entities, repository contracts, and validation rules. `UserAuth.CleanArch.Application` contains service interfaces, mappings, and application logic. `UserAuth.CleanArch.Infra.Data` provides MongoDB context and repository implementations, while `UserAuth.CleanArch.Infra.IoC` centralizes dependency injection. Tests currently live in `UserAuth.CleanArch.Domain.Tests`. Docker assets are isolated in `Docker/`.
+This repository contains separate microservices. `UserAuthCleanArch/` follows a layered Clean Architecture layout: `UserAuth.CleanArch.Domain` holds entities, repository contracts, and validation rules; `UserAuth.CleanArch.Application` contains service interfaces, mappings, and application logic; `UserAuth.CleanArch.Infra.Data` provides MongoDB context and repository implementations; and `UserAuth.CleanArch.Infra.IoC` centralizes dependency injection. Tests currently live in `UserAuth.CleanArch.Domain.Tests`. `CatalogServiceMvc/` is a separate MVC-style microservice. Each microservice keeps its own `Dockerfile` at the microservice root, and the root `docker-compose.yml` orchestrates all services.
 
 ## Build, Test, and Development Commands
 Use the test project as the entry point because it references the domain layer.
@@ -9,7 +9,8 @@ Use the test project as the entry point because it references the domain layer.
 - `dotnet build UserAuthCleanArch/UserAuth.CleanArch.Domain.Tests/UserAuth.CleanArch.Domain.Tests.csproj` builds the test project and referenced projects.
 - `dotnet test UserAuthCleanArch/UserAuth.CleanArch.Domain.Tests/UserAuth.CleanArch.Domain.Tests.csproj` runs the xUnit suite.
 - `dotnet test UserAuthCleanArch/UserAuth.CleanArch.Domain.Tests/UserAuth.CleanArch.Domain.Tests.csproj --collect:"XPlat Code Coverage"` collects coverage with Coverlet.
-- `docker compose -f Docker/docker-compose.yml up -d` starts MongoDB and Mongo Express for local infrastructure.
+- `docker compose up -d --build` starts the root orchestrator with the microservices, MongoDB, and Mongo Express.
+- `docker compose down` stops the local stack.
 
 ## Coding Style & Naming Conventions
 Follow existing C# conventions: 4-space indentation, one public type per file, `PascalCase` for types and methods, `_camelCase` for private readonly fields, and clear interface names prefixed with `I` such as `IUserRepository`. Keep domain validation close to the entity or value object it protects. Prefer nullable annotations consistent with `Nullable` being enabled on all projects.

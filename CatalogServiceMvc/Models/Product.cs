@@ -1,4 +1,4 @@
-namespace CatalogServiceMvcMvc.Models;
+namespace CatalogServiceMvc.Models;
 
 public class Product
 {

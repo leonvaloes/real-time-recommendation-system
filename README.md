@@ -8,6 +8,7 @@ A ideia principal dessa arquitetura e separar responsabilidades: a API recebe as
 
 ```text
 UserAuthCleanArch/
+  Dockerfile
   UserAuth.CleanArch.API/
   UserAuth.CleanArch.Application/
   UserAuth.CleanArch.Domain/
@@ -15,6 +16,14 @@ UserAuthCleanArch/
   UserAuth.CleanArch.Infra.IoC/
   UserAuth.CleanArch.Domain.Tests/
   UserAuth.CleanArch.Data/
+CatalogServiceMvc/
+  Dockerfile
+  Controllers/
+  Models/
+  Services/
+  Repositories/
+  Views/
+docker-compose.yml
 Docker/
 ```
 
@@ -214,18 +223,29 @@ Pelo desenho atual, a infraestrutura de dados esta sendo feita em `UserAuth.Clea
 
 ## Docker
 
-A pasta `Docker/` contem o `docker-compose.yml` para subir dependencias locais.
+Cada microservico possui seu proprio `Dockerfile` na raiz do microservico:
 
-Servicos configurados:
+```text
+UserAuthCleanArch/Dockerfile
+CatalogServiceMvc/Dockerfile
+```
 
+O `docker-compose.yml` da raiz e o orquestrador externo. Ele sobe os microservicos e as dependencias locais.
+
+Servicos configurados no compose da raiz:
+
+- UserAuthCleanArch na porta `5000`.
+- CatalogServiceMvc na porta `5001`.
 - MongoDB na porta `27017`.
 - Mongo Express na porta `8081`.
 
 Comando:
 
 ```bash
-docker compose -f Docker/docker-compose.yml up -d
+docker compose up -d --build
 ```
+
+Existe tambem um compose em `Docker/docker-compose.yml` mantido como alternativa, mas o fluxo recomendado e usar o `docker-compose.yml` da raiz.
 
 ## Fluxo completo de uma requisicao
 
@@ -297,16 +317,22 @@ Executar testes com cobertura:
 dotnet test UserAuthCleanArch/UserAuth.CleanArch.Domain.Tests/UserAuth.CleanArch.Domain.Tests.csproj --collect:"XPlat Code Coverage"
 ```
 
-Subir API, MongoDB e Mongo Express:
+Subir todos os servicos:
 
 ```bash
-docker compose -f Docker/docker-compose.yml up -d
+docker compose up -d --build
 ```
 
-A API fica disponivel em:
+UserAuthCleanArch fica disponivel em:
 
 ```text
 http://localhost:5000
+```
+
+CatalogServiceMvc fica disponivel em:
+
+```text
+http://localhost:5001
 ```
 
 O Mongo Express fica disponivel em:

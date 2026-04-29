@@ -1,23 +1,7 @@
 services:
-  catalog-service-mvc:
-    build:
-      context: ..
-      dockerfile: CatalogServiceMvc/Dockerfile
-    container_name: catalog-service-mvc
-    restart: always
-    environment:
-      ASPNETCORE_URLS: http://+:8080
-      JWT_SECRET: change-this-secret-in-development
-      JWT_ISSUER: UserAuth.CleanArch.API
-      JWT_AUDIENCE: UserAuth.CleanArch.Client
-    ports:
-      - 5001:8080
-    depends_on:
-      - user-auth-cleanarch
-
   user-auth-cleanarch:
     build:
-      context: ..
+      context: .
       dockerfile: UserAuthCleanArch/Dockerfile
     container_name: user-auth-cleanarch
     restart: always
@@ -32,6 +16,22 @@ services:
       - 5000:8080
     depends_on:
       - mongo
+
+  catalog-service-mvc:
+    build:
+      context: .
+      dockerfile: CatalogServiceMvc/Dockerfile
+    container_name: catalog-service-mvc
+    restart: always
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      JWT_SECRET: change-this-secret-in-development
+      JWT_ISSUER: UserAuth.CleanArch.API
+      JWT_AUDIENCE: UserAuth.CleanArch.Client
+    ports:
+      - 5001:8080
+    depends_on:
+      - user-auth-cleanarch
 
   mongo:
     image: mongo
