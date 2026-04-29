@@ -1,5 +1,6 @@
 using CleanArch.Application.DTOs;
 using CleanArch.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArch.API.Controllers;
@@ -15,6 +16,7 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
+    [Authorize(Policy = "CanReadUsers")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -22,8 +24,8 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
         var user = await _userService.GetByIdAsync(id);
         if (user is null)
@@ -53,8 +55,9 @@ public class UserController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
     }
 
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id)
+    [Authorize(Policy = "AdminOnly")]
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
     {
         var user = await _userService.RemoveByIdAsync(id);
         if (user is null)

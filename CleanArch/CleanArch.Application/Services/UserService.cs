@@ -29,17 +29,17 @@ public class UserService : IUserService
         return _userRepository.GetAllAsync();
     }
 
-    public Task<User> GetByEmailAsync(string email)
+    public Task<User?> GetByEmailAsync(string email)
     {
         return _userRepository.GetByEmailAsync(email);
     }
 
-    public Task<User> GetByIdAsync(int? id)
+    public Task<User?> GetByIdAsync(Guid id)
     {
         return _userRepository.GetByIdAsync(id);
     }
 
-    public Task<User> RemoveByIdAsync(int id)
+    public Task<User?> RemoveByIdAsync(Guid id)
     {
         return _userRepository.RemoveByIdAsync(id);
     }

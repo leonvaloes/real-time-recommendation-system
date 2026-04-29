@@ -1,11 +1,13 @@
 ﻿namespace CleanArch.Infra.IoC;
 
 using CleanArch.Application.Interfaces;
+using CleanArch.Application.Interfaces.Auth;
 using CleanArch.Application.Mappings;
 using CleanArch.Application.Services;
 using CleanArch.Domain.Interfaces;
 using CleanArch.Infra.Data.Context;
 using CleanArch.Infra.Data.Repositories;
+using CleanArch.Infra.IoC.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +19,9 @@ public static class DependencyInjection
         services.AddSingleton<MongoContext>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
+        services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<CreateUserMapping>();
 
         return services;

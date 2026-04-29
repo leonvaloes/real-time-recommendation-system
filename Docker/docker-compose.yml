@@ -1,4 +1,21 @@
 services:
+  cleanarch-api:
+    build:
+      context: ..
+      dockerfile: CleanArch/CleanArch.API/Dockerfile
+    restart: always
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      MONGODB_URI: mongodb://user:1234@mongo:27017/?authSource=admin
+      MONGODB_DB: cleanarch
+      JWT_SECRET: change-this-secret-in-development
+      JWT_ISSUER: CleanArch.API
+      JWT_AUDIENCE: CleanArch.Client
+    ports:
+      - 5000:8080
+    depends_on:
+      - mongo
+
   mongo:
     image: mongo
     restart: always
@@ -7,6 +24,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: 1234
     ports:
       - 27017:27017
+    volumes:
+      - mongo_data:/data/db
 
   mongo-express:
     image: mongo-express
@@ -18,3 +37,8 @@ services:
       ME_CONFIG_BASICAUTH_ENABLED: true
       ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
       ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:

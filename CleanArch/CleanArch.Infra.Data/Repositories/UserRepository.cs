@@ -32,7 +32,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            var sort = Builders<User>.Sort.Ascending(u => u.Id);
+            var sort = Builders<User>.Sort.Ascending(u => u.Email);
             var allUsers = await _mongoContext.Users.Find(_ => true).Sort(sort).ToListAsync();
             return allUsers;
         }
@@ -44,11 +44,12 @@ public class UserRepository : IUserRepository
     }
 
 
-    public async Task<User> GetByEmailAsync(string email)
+    public async Task<User?> GetByEmailAsync(string email)
     {
         try
         {
-            return await _mongoContext.Users.Find(u => u.Email == email).FirstOrDefaultAsync();
+            var normalizedEmail = email.ToLowerInvariant();
+            return await _mongoContext.Users.Find(u => u.Email == normalizedEmail).FirstOrDefaultAsync();
         }
         catch (Exception e)
         {
@@ -57,11 +58,11 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public Task<User> GetByIdAsync(int? id)
+    public async Task<User?> GetByIdAsync(Guid id)
     {
         try
         {
-            return _mongoContext.Users.Find(u => u.Id == id).FirstOrDefaultAsync();
+            return await _mongoContext.Users.Find(u => u.Id == id).FirstOrDefaultAsync();
         }
         catch (Exception e)
         {
@@ -71,7 +72,7 @@ public class UserRepository : IUserRepository
 
     }
 
-    public async Task<User> RemoveByIdAsync(int id)
+    public async Task<User?> RemoveByIdAsync(Guid id)
     {
         try
         {
