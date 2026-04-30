@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository contains separate microservices. `UserAuthCleanArch/` follows a layered Clean Architecture layout: `UserAuth.CleanArch.Domain` holds entities, repository contracts, and validation rules; `UserAuth.CleanArch.Application` contains service interfaces, mappings, and application logic; `UserAuth.CleanArch.Infra.Data` provides MySQL persistence and repository implementations; and `UserAuth.CleanArch.Infra.IoC` centralizes dependency injection. Tests currently live in `UserAuth.CleanArch.Domain.Tests`. `CatalogServiceMvc/` is a separate MVC-style microservice for event products; it uses PostgreSQL with relational product fields and a `metadata` JSONB column for type-specific details. Each microservice keeps its own `Dockerfile` at the microservice root, and the root `docker-compose.yml` orchestrates all services.
+This repository contains separate microservices. `UserAuthCleanArch/` follows a layered Clean Architecture layout: `UserAuth.CleanArch.Domain` holds entities, repository contracts, and validation rules; `UserAuth.CleanArch.Application` contains service interfaces, mappings, and application logic; `UserAuth.CleanArch.Infra.Data` provides MySQL persistence and repository implementations; and `UserAuth.CleanArch.Infra.IoC` centralizes dependency injection. Tests currently live in `UserAuth.CleanArch.Domain.Tests`. `CatalogServiceMvc/` is a separate MVC-style microservice for event products; it uses PostgreSQL with relational product fields and a `metadata` JSONB column for type-specific details. `Frontend/` is a Vite React console for visualizing the system, catalog, authorization rules, and future recommendation signals. Each service keeps its own `Dockerfile` at the service root, and the root `docker-compose.yml` orchestrates all services.
 
 ## Build, Test, and Development Commands
 Use the test project as the entry point because it references the domain layer.
@@ -11,6 +11,7 @@ Use the test project as the entry point because it references the domain layer.
 - `dotnet test UserAuthCleanArch/UserAuth.CleanArch.Domain.Tests/UserAuth.CleanArch.Domain.Tests.csproj --collect:"XPlat Code Coverage"` collects coverage with Coverlet.
 - `docker compose up -d --build` starts the root orchestrator with the microservices, MySQL, PostgreSQL, and Adminer.
 - `docker compose down` stops the local stack.
+- `cd Frontend && npm install && npm run dev` starts the frontend console locally.
 
 ## Coding Style & Naming Conventions
 Follow existing C# conventions: 4-space indentation, one public type per file, `PascalCase` for types and methods, `_camelCase` for private readonly fields, and clear interface names prefixed with `I` such as `IUserRepository`. Keep domain validation close to the entity or value object it protects. Prefer nullable annotations consistent with `Nullable` being enabled on all projects.

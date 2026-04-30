@@ -24,6 +24,9 @@ CatalogServiceMvc/
   Services/
   Repositories/
   Views/
+Frontend/
+  Dockerfile
+  src/
 docker-compose.yml
 Docker/
 ```
@@ -236,6 +239,7 @@ Servicos configurados no compose da raiz:
 
 - UserAuthCleanArch na porta `5000`.
 - CatalogServiceMvc na porta `5001`.
+- Frontend na porta `3000`.
 - MySQL na porta `3306`.
 - PostgreSQL na porta `5432`.
 - Adminer na porta `8081`.
@@ -336,6 +340,12 @@ CatalogServiceMvc fica disponivel em:
 http://localhost:5001
 ```
 
+Frontend fica disponivel em:
+
+```text
+http://localhost:3000
+```
+
 O Adminer fica disponivel em:
 
 ```text
@@ -419,6 +429,36 @@ Exemplo de cadastro de roupa:
     "material": "algodao"
   }
 }
+```
+
+## Frontend
+
+O `Frontend` e uma aplicacao React com Vite para visualizar o sistema de microservicos.
+
+Responsabilidades:
+
+- Apresentar uma visao geral dos modulos do projeto.
+- Mostrar indicadores do catalogo de produtos por evento.
+- Renderizar produtos vindos do `CatalogServiceMvc`.
+- Exibir endpoints protegidos e permissoes esperadas.
+- Mostrar sinais que podem alimentar o futuro modulo de recomendacao.
+
+O front tenta consumir produtos do `CatalogServiceMvc` usando:
+
+```text
+VITE_CATALOG_API_URL
+VITE_CATALOG_TOKEN
+```
+
+Se nao houver token configurado, ele usa produtos de fallback para manter o console funcionando em modo demonstracao.
+
+Comandos:
+
+```bash
+cd Frontend
+npm install
+npm run dev
+npm run build
 ```
 
 ## Modulo de autenticacao

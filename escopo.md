@@ -36,7 +36,7 @@ Responsabilidades atuais:
 - Geracao de token JWT.
 - Autorizacao por roles e permissions.
 - Modelagem de usuario como pessoa fisica ou juridica.
-- Persistencia em MongoDB.
+- Persistencia em MySQL.
 
 Conceitos principais:
 
@@ -87,7 +87,7 @@ Exemplos de adapters:
 
 ### Catalog/Purchase - Onion Architecture
 
-Modulo futuro para produtos, categorias, compras ou historico de consumo.
+Modulo futuro para compras, pedidos, historico de consumo e regras comerciais mais ricas.
 
 Esse modulo pode seguir Onion Architecture, mantendo o dominio no centro e adicionando aneis ao redor dele.
 
@@ -102,21 +102,21 @@ Presentation
 
 Possiveis responsabilidades:
 
-- Cadastro de produtos.
 - Registro de compras.
+- Registro de itens comprados.
 - Historico de consumo.
 - Base para alimentar recomendacoes.
 
 Conceitos possiveis:
 
-- `Product`
-- `Category`
 - `Purchase`
 - `PurchaseItem`
+- `Order`
+- `Payment`
 
 ### Catalog Service - MVC
 
-Microservico separado para catalogo de produtos.
+Microservico separado para catalogo de produtos de eventos.
 
 Esse modulo usa arquitetura MVC interna, mas sem depender dos projetos do `User/Auth Service`.
 
@@ -133,8 +133,55 @@ Responsabilidades:
 - Listar produtos.
 - Buscar produto por id.
 - Criar produto.
+- Relacionar produto com evento usando `eventId`.
+- Persistir produtos em PostgreSQL.
+- Usar `metadata` em JSONB para detalhes especificos por tipo de produto.
 - Validar o JWT emitido pelo User/Auth Service.
 - Autorizar acesso por permissions do token.
+
+Tipos de produtos esperados:
+
+- Ingressos.
+- Roupas.
+- Combos.
+- Estacionamento.
+- Produtos promocionais.
+
+Modelo base:
+
+```text
+Product
+  id
+  eventId
+  name
+  type
+  price
+  stockQuantity
+  metadata
+  isActive
+```
+
+O campo `metadata` deve guardar informacoes que variam conforme o tipo do produto.
+
+Exemplo para ingresso:
+
+```json
+{
+  "sector": "VIP",
+  "batch": "1 lote",
+  "entryTime": "20:00"
+}
+```
+
+Exemplo para roupa:
+
+```json
+{
+  "size": "M",
+  "color": "preta",
+  "material": "algodao"
+}
+```
 
 Endpoints planejados:
 
@@ -146,9 +193,100 @@ POST /api/products
   Exige permission: catalog:write
 ```
 
+### Frontend - System Console
+
+Aplicacao front-end separada para visualizar os microservicos, produtos de eventos, permissoes e sinais que futuramente alimentarao o modulo de recomendacao.
+
+Objetivo principal:
+
+- Dar uma interface visual coerente para o projeto.
+- Apresentar a separacao entre Auth, Catalog e Recommendation.
+- Apresentar produtos e ingressos vindos do `CatalogServiceMvc`.
+- Exibir indicadores de catalogo, estoque e eventos.
+- Documentar visualmente permissoes exigidas por endpoint.
+- Mostrar como os dados do catalogo podem gerar sinais de recomendacao.
+
+Stack sugerida:
+
+```text
+React
+Vite
+TypeScript
+Tailwind CSS
+Docker
+```
+
+Direcao visual:
+
+```text
+Console operacional com identidade forte
+Cores vivas
+Bordas pretas fortes
+Cards densos e escaneaveis
+Tipografia forte
+Textos com alto contraste
+Controles claros para busca e filtros
+```
+
+Paleta inicial inspirada nas referencias visuais:
+
+```text
+Turquesa vivo: fundo principal e areas amplas
+Roxo intenso: cards, secoes e palcos
+Pink/rosa: chamadas fortes e blocos de impacto
+Amarelo: urgencia, destaque de preco e beneficios
+Preto: bordas, sombras e contraste
+Branco: textos principais com contorno/sombra
+Vermelho: erros, risco e mensagens criticas
+```
+
+Estrutura planejada da tela:
+
+1. Sidebar de navegacao.
+2. Header com estado da conexao com a API.
+3. Visao geral dos modulos arquiteturais.
+4. Indicadores do catalogo.
+5. Tabela de produtos por evento.
+6. Busca e filtro por tipo de produto.
+7. Matriz de endpoints e permissoes.
+8. Painel de sinais para recomendacao.
+
+Secao de produtos:
+
+```text
+GET /api/products
+```
+
+Cada produto deve ser renderizado conforme o `type`:
+
+```text
+ticket   -> card de ingresso
+clothing -> card de produto/roupa
+combo    -> card promocional
+parking  -> card de estacionamento
+```
+
+Campos visiveis na tabela:
+
+- Nome.
+- Tipo.
+- Preco.
+- Estoque.
+- `eventId`.
+- Dados relevantes do `metadata`, como lote ou setor.
+
+UX esperada:
+
+- CTA sempre facil de encontrar.
+- Mobile-first.
+- Informacao densa, mas organizada.
+- Tabelas e cards escaneaveis.
+- Estado claro quando os dados vierem da API ou de fallback.
+- Inspiracao visual nas referencias, sem copiar o conteudo do evento.
+
 ## Escopo Atual Implementado
 
-O escopo atualmente implementado esta concentrado no modulo `User/Auth`.
+O escopo atualmente implementado esta concentrado nos modulos `User/Auth`, `CatalogServiceMvc` e `Frontend`.
 
 Funcionalidades implementadas:
 
@@ -160,7 +298,13 @@ Funcionalidades implementadas:
 - Roles e permissions no dominio.
 - Protecao de endpoint por permission.
 - Protecao de endpoint por role.
-- Docker Compose com API, MongoDB e Mongo Express.
+- Docker Compose com Auth, Catalog, MySQL, PostgreSQL e Adminer.
+- Catalogo de produtos com PostgreSQL.
+- Produtos associados a eventos por `eventId`.
+- Campo `metadata` em JSONB para detalhes variaveis.
+- Console front-end em React/Vite.
+- Dockerfile proprio para o front-end.
+- Orquestracao do front-end pelo Docker Compose.
 
 Endpoints protegidos:
 
@@ -170,6 +314,12 @@ GET /api/user
 
 DELETE /api/user/{id}
   Exige role: Admin
+
+GET /api/products
+  Exige permission: catalog:read
+
+POST /api/products
+  Exige permission: catalog:write
 ```
 
 ## Fora do Escopo Inicial
@@ -186,16 +336,20 @@ Os itens abaixo nao fazem parte da primeira entrega:
 - Mensageria/event streaming.
 - Cache distribuido.
 - Observabilidade completa.
+- Checkout real de pagamento.
+- Gateway de pagamento.
+- Integracao real com bilheteria externa.
 
 ## Proximas Etapas
 
 1. Criar CRUD de roles e permissions.
 2. Permitir associar roles a usuarios.
-3. Criar modulo `Recommendation` usando Hexagonal Architecture.
-4. Criar modulo `Catalog/Purchase` usando Onion Architecture.
-5. Evoluir o `CatalogServiceMvc` MVC com persistencia propria.
-6. Adicionar testes de aplicacao para autenticacao e autorizacao.
-7. Adicionar testes de integracao com MongoDB via Docker.
+3. Integrar o `Frontend` com produtos reais autenticados do `CatalogServiceMvc`.
+4. Criar fluxo de administracao para cadastrar produtos de evento.
+5. Criar modulo `Recommendation` usando Hexagonal Architecture.
+6. Criar modulo `Catalog/Purchase` usando Onion Architecture.
+7. Adicionar testes de aplicacao para autenticacao e autorizacao.
+8. Adicionar testes de integracao com MySQL e PostgreSQL via Docker.
 
 ## Observacao de Design
 

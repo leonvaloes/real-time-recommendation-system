@@ -2,7 +2,11 @@
 **/obj/
 **/.vs/
 **/.vscode/
+**/node_modules/
+**/dist/
+**/.vite/
 .git/
 .gitignore
 Docker/
 README.md
+image*.png
