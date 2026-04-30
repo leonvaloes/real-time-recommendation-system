@@ -31,9 +31,12 @@ public class ProductService : IProductService
 
         var product = new Product
         {
+            EventId = request.EventId,
             Name = request.Name.Trim(),
-            Category = request.Category.Trim(),
-            Price = request.Price
+            Type = request.Type.Trim(),
+            Price = request.Price,
+            StockQuantity = request.StockQuantity,
+            Metadata = request.Metadata
         };
 
         await _productRepository.CreateAsync(product);
@@ -45,9 +48,12 @@ public class ProductService : IProductService
         return new ProductResponse
         {
             Id = product.Id,
+            EventId = product.EventId,
             Name = product.Name,
-            Category = product.Category,
+            Type = product.Type,
             Price = product.Price,
+            StockQuantity = product.StockQuantity,
+            Metadata = product.Metadata,
             IsActive = product.IsActive
         };
     }
@@ -59,14 +65,24 @@ public class ProductService : IProductService
             throw new ArgumentException("Name is required");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Category))
+        if (request.EventId == Guid.Empty)
         {
-            throw new ArgumentException("Category is required");
+            throw new ArgumentException("EventId is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Type))
+        {
+            throw new ArgumentException("Type is required");
         }
 
         if (request.Price <= 0)
         {
             throw new ArgumentException("Price must be greater than zero");
+        }
+
+        if (request.StockQuantity < 0)
+        {
+            throw new ArgumentException("StockQuantity cannot be negative");
         }
     }
 }

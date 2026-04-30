@@ -19,6 +19,7 @@ UserAuthCleanArch/
 CatalogServiceMvc/
   Dockerfile
   Controllers/
+  Data/
   Models/
   Services/
   Repositories/
@@ -236,6 +237,7 @@ Servicos configurados no compose da raiz:
 - UserAuthCleanArch na porta `5000`.
 - CatalogServiceMvc na porta `5001`.
 - MySQL na porta `3306`.
+- PostgreSQL na porta `5432`.
 - Adminer na porta `8081`.
 
 Comando:
@@ -342,10 +344,11 @@ http://localhost:8081
 
 ## Configuracao
 
-Antes de executar a API usando MySQL, configure as variaveis de ambiente:
+Antes de executar os servicos, configure as variaveis de ambiente:
 
 ```text
 MYSQL_CONNECTION_STRING
+POSTGRES_CONNECTION_STRING
 JWT_SECRET
 JWT_ISSUER
 JWT_AUDIENCE
@@ -355,9 +358,67 @@ Exemplo local usando o Docker Compose:
 
 ```text
 MYSQL_CONNECTION_STRING=Server=localhost;Port=3306;Database=user_auth;User=user;Password=1234;Allow User Variables=True;
+POSTGRES_CONNECTION_STRING=Host=localhost;Port=5432;Database=catalog;Username=catalog;Password=1234
 JWT_SECRET=change-this-secret-in-development
 JWT_ISSUER=UserAuth.CleanArch.API
 JWT_AUDIENCE=UserAuth.CleanArch.Client
+```
+
+## Modulo de catalogo de produtos
+
+O `CatalogServiceMvc` e um microservico separado em estilo MVC. Ele expoe endpoints de catalogo protegidos por JWT e permissoes:
+
+```text
+GET  /api/products       requer catalog:read
+GET  /api/products/{id}  requer catalog:read
+POST /api/products       requer catalog:write
+```
+
+O catalogo usa PostgreSQL. A tabela `products` e criada automaticamente pelo `PostgresContext`.
+
+Campos principais:
+
+- `id`: identificador do produto.
+- `event_id`: identificador do evento ao qual o produto pertence.
+- `name`: nome do produto.
+- `type`: tipo do produto, como `ticket`, `clothing`, `parking` ou `combo`.
+- `price`: preco.
+- `stock_quantity`: quantidade em estoque.
+- `metadata`: campo `jsonb` para detalhes variaveis por tipo de produto.
+- `is_active`: indica se o produto esta ativo.
+
+Exemplo de cadastro de ingresso:
+
+```json
+{
+  "eventId": "2d33e70b-fd66-4a7f-b833-b63d190a9645",
+  "name": "Ingresso VIP",
+  "type": "ticket",
+  "price": 150.00,
+  "stockQuantity": 100,
+  "metadata": {
+    "sector": "VIP",
+    "batch": "1 lote",
+    "entryTime": "20:00"
+  }
+}
+```
+
+Exemplo de cadastro de roupa:
+
+```json
+{
+  "eventId": "2d33e70b-fd66-4a7f-b833-b63d190a9645",
+  "name": "Camiseta Oficial",
+  "type": "clothing",
+  "price": 80.00,
+  "stockQuantity": 50,
+  "metadata": {
+    "size": "M",
+    "color": "preta",
+    "material": "algodao"
+  }
+}
 ```
 
 ## Modulo de autenticacao

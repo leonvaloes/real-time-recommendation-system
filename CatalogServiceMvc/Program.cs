@@ -1,4 +1,5 @@
 using System.Text;
+using CatalogServiceMvc.Data;
 using CatalogServiceMvc.Repositories;
 using CatalogServiceMvc.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,7 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IProductRepository, InMemoryProductRepository>();
+builder.Services.AddSingleton<PostgresContext>();
+builder.Services.AddScoped<IProductRepository, PostgresProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
