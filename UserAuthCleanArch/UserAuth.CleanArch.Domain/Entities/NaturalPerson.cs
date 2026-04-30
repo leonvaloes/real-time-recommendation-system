@@ -25,6 +25,16 @@ public sealed class NaturalPerson : IPerson
         CPF = string.IsNullOrWhiteSpace(cpf) ? null : new Cpf(cpf);
     }
 
+    public static NaturalPerson Restore(Guid id, string firstName, string lastName, string? cpf)
+    {
+        var person = new NaturalPerson(firstName, lastName, cpf)
+        {
+            Id = id
+        };
+
+        return person;
+    }
+
     public string GetIdentifier()
     {
         return CPF?.Value ?? string.Empty;

@@ -25,6 +25,16 @@ public sealed class JuridicalPerson : IPerson
         BusinessName = string.IsNullOrWhiteSpace(businessName) ? null : businessName.Trim();
     }
 
+    public static JuridicalPerson Restore(Guid id, string cnpj, string registeredName, string? businessName)
+    {
+        var person = new JuridicalPerson(cnpj, registeredName, businessName)
+        {
+            Id = id
+        };
+
+        return person;
+    }
+
     public string GetIdentifier()
     {
         return CNPJ.Value;

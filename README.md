@@ -82,7 +82,7 @@ CreateUserDTO
   -> IUserRepository.CreateAsync
 ```
 
-Essa camada sabe o que o caso de uso precisa fazer, mas nao deve saber detalhes de MongoDB, HTTP ou Docker.
+Essa camada sabe o que o caso de uso precisa fazer, mas nao deve saber detalhes de MySQL, HTTP ou Docker.
 
 O modulo de autenticacao tambem fica nesta camada por meio do `AuthService`.
 
@@ -133,18 +133,18 @@ O `IPerson` fica em `Domain/Abstractions` porque representa um conceito do domin
 
 O `User` guarda o hash da senha, nao a senha em texto puro. A pessoa associada ao usuario pode ser `NaturalPerson` ou `JuridicalPerson`.
 
-Essa camada nao deve depender da API, da infraestrutura, do MongoDB ou de frameworks externos de persistencia.
+Essa camada nao deve depender da API, da infraestrutura, do MySQL ou de frameworks externos de persistencia.
 
 ## UserAuth.CleanArch.Infra.Data
 
 Camada de infraestrutura de dados.
 
-Essa camada implementa os contratos definidos no dominio usando uma tecnologia concreta. Neste projeto, ela usa MongoDB.
+Essa camada implementa os contratos definidos no dominio usando uma tecnologia concreta. Neste projeto, o modulo de autenticacao usa MySQL.
 
 Responsabilidades:
 
-- Configurar conexao com MongoDB.
-- Expor colecoes pelo `MongoContext`.
+- Configurar conexao com MySQL.
+- Criar a tabela `users` quando necessario pelo `MySqlContext`.
 - Implementar repositorios concretos, como `UserRepository`.
 - Traduzir chamadas de repositorio para operacoes reais no banco.
 
@@ -153,16 +153,15 @@ Exemplo:
 ```text
 IUserRepository
   -> UserRepository
-  -> MongoContext
-  -> MongoDB
+  -> MySqlContext
+  -> MySQL
 ```
 
-O `MongoContext` le as variaveis de ambiente:
+O `MySqlContext` le a variavel de ambiente:
 
-- `MONGODB_URI`
-- `MONGODB_DB`
+- `MYSQL_CONNECTION_STRING`
 
-O `UserRepository` usa a colecao `users` para criar, buscar, atualizar e remover usuarios.
+O `UserRepository` usa a tabela `users` para criar, buscar, atualizar e remover usuarios.
 
 ## UserAuth.CleanArch.Infra.IoC
 
@@ -179,7 +178,7 @@ services.AddScoped<IAuthService, AuthService>();
 services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
 services.AddScoped<ITokenService, JwtTokenService>();
 services.AddScoped<CreateUserMapping>();
-services.AddSingleton<MongoContext>();
+services.AddSingleton<MySqlContext>();
 ```
 
 Isso significa:
@@ -236,8 +235,8 @@ Servicos configurados no compose da raiz:
 
 - UserAuthCleanArch na porta `5000`.
 - CatalogServiceMvc na porta `5001`.
-- MongoDB na porta `27017`.
-- Mongo Express na porta `8081`.
+- MySQL na porta `3306`.
+- Adminer na porta `8081`.
 
 Comando:
 
@@ -259,8 +258,8 @@ Cliente HTTP
   -> UserAuth.CleanArch.Domain/User
   -> UserAuth.CleanArch.Domain/IUserRepository
   -> UserAuth.CleanArch.Infra.Data/UserRepository
-  -> UserAuth.CleanArch.Infra.Data/MongoContext
-  -> MongoDB
+  -> UserAuth.CleanArch.Infra.Data/MySqlContext
+  -> MySQL
 ```
 
 Exemplo: login.
@@ -271,8 +270,8 @@ Cliente HTTP
   -> UserAuth.CleanArch.Application/AuthService
   -> UserAuth.CleanArch.Domain/IUserRepository
   -> UserAuth.CleanArch.Infra.Data/UserRepository
-  -> UserAuth.CleanArch.Infra.Data/MongoContext
-  -> MongoDB
+  -> UserAuth.CleanArch.Infra.Data/MySqlContext
+  -> MySQL
   -> UserAuth.CleanArch.Application/IPasswordHasher
   -> UserAuth.CleanArch.Application/ITokenService
 ```
@@ -335,7 +334,7 @@ CatalogServiceMvc fica disponivel em:
 http://localhost:5001
 ```
 
-O Mongo Express fica disponivel em:
+O Adminer fica disponivel em:
 
 ```text
 http://localhost:8081
@@ -343,11 +342,10 @@ http://localhost:8081
 
 ## Configuracao
 
-Antes de executar a API usando MongoDB, configure as variaveis de ambiente:
+Antes de executar a API usando MySQL, configure as variaveis de ambiente:
 
 ```text
-MONGODB_URI
-MONGODB_DB
+MYSQL_CONNECTION_STRING
 JWT_SECRET
 JWT_ISSUER
 JWT_AUDIENCE
@@ -356,8 +354,7 @@ JWT_AUDIENCE
 Exemplo local usando o Docker Compose:
 
 ```text
-MONGODB_URI=mongodb://user:1234@localhost:27017/
-MONGODB_DB=cleanarch
+MYSQL_CONNECTION_STRING=Server=localhost;Port=3306;Database=user_auth;User=user;Password=1234;Allow User Variables=True;
 JWT_SECRET=change-this-secret-in-development
 JWT_ISSUER=UserAuth.CleanArch.API
 JWT_AUDIENCE=UserAuth.CleanArch.Client
@@ -393,7 +390,8 @@ Domain
 
 Infra.Data
   UserRepository
-  MongoContext.Users
+  MySqlContext
+  users table
 
 Infra.IoC
   Pbkdf2PasswordHasher

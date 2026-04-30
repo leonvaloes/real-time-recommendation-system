@@ -38,6 +38,31 @@ public sealed class User
         SetPerson(person);
     }
 
+    public static User Restore(
+        Guid id,
+        string email,
+        string passwordHash,
+        string? phone,
+        IPerson person,
+        bool isActive,
+        DateTime createdAt,
+        DateTime updatedAt,
+        DateTime? lastActivity,
+        IEnumerable<Role>? roles)
+    {
+        var user = new User(email, passwordHash, person, phone)
+        {
+            Id = id,
+            IsActive = isActive,
+            CreatedAt = createdAt,
+            UpdatedAt = updatedAt,
+            LastActivity = lastActivity,
+            Roles = roles?.ToList() ?? new List<Role>()
+        };
+
+        return user;
+    }
+
     public string GetUserDisplayName()
     {
         return GetPerson().GetDisplayName();

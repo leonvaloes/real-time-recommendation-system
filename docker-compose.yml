@@ -7,15 +7,14 @@ services:
     restart: always
     environment:
       ASPNETCORE_URLS: http://+:8080
-      MONGODB_URI: mongodb://user:1234@mongo:27017/?authSource=admin
-      MONGODB_DB: cleanarch
+      MYSQL_CONNECTION_STRING: Server=mysql;Port=3306;Database=user_auth;User=user;Password=1234;Allow User Variables=True;
       JWT_SECRET: change-this-secret-in-development
       JWT_ISSUER: UserAuth.CleanArch.API
       JWT_AUDIENCE: UserAuth.CleanArch.Client
     ports:
       - 5000:8080
     depends_on:
-      - mongo
+      - mysql
 
   catalog-service-mvc:
     build:
@@ -33,31 +32,28 @@ services:
     depends_on:
       - user-auth-cleanarch
 
-  mongo:
-    image: mongo
-    container_name: mongo
+  mysql:
+    image: mysql:8.4
+    container_name: mysql
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: user
-      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: user_auth
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1234
     ports:
-      - 27017:27017
+      - 3306:3306
     volumes:
-      - mongo_data:/data/db
+      - mysql_data:/var/lib/mysql
 
-  mongo-express:
-    image: mongo-express
-    container_name: mongo-express
+  adminer:
+    image: adminer
+    container_name: adminer
     restart: always
     ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_URL: mongodb://user:1234@mongo:27017/
-      ME_CONFIG_BASICAUTH_ENABLED: true
-      ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
-      ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+      - 8081:8080
     depends_on:
-      - mongo
+      - mysql
 
 volumes:
-  mongo_data:
+  mysql_data:

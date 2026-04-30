@@ -17,8 +17,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
-    <PackageReference Include="MongoDB.Driver" Version="3.4.2" />
-    <PackageReference Include="MongoDB.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
   </ItemGroup>
 
   <ItemGroup>
